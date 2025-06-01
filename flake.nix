@@ -3,7 +3,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
-  outputs = { self, nixpkgs, nix }:
+  outputs = { self, nixpkgs }:
     let
       supportedSystems = [ "x86_64-linux" ];
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
@@ -18,11 +18,11 @@
       overlayList = [ self.overlays.default ];
     in {
 
-      overlays.default = final: prev: { nixism = final.callPackage ./package.nix { }; };
+      overlays.default = final: prev: { saltz = final.callPackage ./package.nix { }; };
 
       packages = forAllSystems (system: {
-        default = pkgsFor.${system}.nixism;
-        nixism = pkgsFor.${system}.nixism;
+        default = pkgsFor.${system}.saltz;
+        saltz = pkgsFor.${system}.saltz;
       });
 
       nixosModules = import ./modules { overlays = overlayList; };
