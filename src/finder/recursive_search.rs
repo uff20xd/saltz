@@ -1,19 +1,32 @@
+use core::str;
 use std::{
-    path::{
-        PathBuf
-    },
+    path::PathBuf,
     process::{
-        Command,
+        Command, Output,
     },
 };
+use users::*;
 use crate::error::SaltzError;
 
 struct Project (String, PathBuf);
 
 fn search_directory (path: PathBuf, hidden_files: bool) -> Vec<PathBuf> {
+    let mut directories = Vec::new();
+    let mut list_command = Command::new("ls");
+    let raw_output = list_command.output().expect("This command should work usually");
+    //let raw_string_of_files = str::from_utf8(&output.stdout[0..output.stdout.len()]);
+    let output = raw_output.stdout;
+    let mut slice_start: usize = 0;
+    let mut slice_end: usize = 0;
+    while output.len()-1 >= slice_end {
+        slice_end += 1;
+        let _  = match output[slice_end] {
+            b' ' => (),
+            _ => ()
+        };
+    }
 
-    let temp = vec![PathBuf::new()];
-    temp
+    directories
 }
 pub fn get_files () -> () {
     ()
