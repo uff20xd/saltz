@@ -7,11 +7,11 @@
 with lib; 
 
 let
-  pgn = config.programs.nixism;
+  pgn = config.programs.saltz;
 in 
   { 
   options = {
-    programs.nixism = rec {
+    programs.saltz = rec {
       enable = mkOption{
         type = types.bool;
         default = false;
@@ -19,7 +19,7 @@ in
     };
   };
   config = mkIf pgn.enable {
-    environment.systemPackages = [ pkgs.nixism ];
+    environment.systemPackages = [ pkgs.saltz ];
   
   };
 
