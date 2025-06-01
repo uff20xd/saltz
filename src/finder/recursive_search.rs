@@ -6,16 +6,22 @@ use std::{
         Command,
     },
 };
+use crate::error::SaltzError;
 
-struct Project (String, PathBuf)
+struct Project (String, PathBuf);
 
 fn search_directory (path: PathBuf, hidden_files: bool) -> Vec<PathBuf> {
-
 
     let temp = vec![PathBuf::new()];
     temp
 }
-fn get_files () -> () {
-
+pub fn get_files () -> () {
+    ()
 }
-fn format
+fn format (paths: Vec<PathBuf>) -> Result<Vec<Project>, SaltzError> {
+    let mut projects = Vec::new();
+    for i in paths {
+
+    }
+    Ok(projects)
+}

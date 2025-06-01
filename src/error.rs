@@ -1,3 +1,4 @@
-enum SaltzError {
-    SearchError
+pub enum SaltzError {
+    SearchError,
+    FormatError,
 }
