@@ -25,3 +25,10 @@ fn format (paths: Vec<PathBuf>) -> Result<Vec<Project>, SaltzError> {
     }
     Ok(projects)
 }
+pub fn get_home_directory () -> String {
+    let current_user_as_osstring = get_current_username()
+        .expect("couldnt get username");
+    let current_user = current_user_as_osstring.to_str()
+        .expect("couldnt convert username to a string");
+    ("/home/").to_string() + current_user
+}

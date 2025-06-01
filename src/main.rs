@@ -1,7 +1,16 @@
 mod finder;
 mod error;
-use finder::recursive_search;
+use std::{
+    str,
+    process::{
+        Command
+    },
+};
+use users::*;
+use finder::recursive_search::*;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut test = Command::new("echo");
 
+    Ok(())
 }
