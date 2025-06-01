@@ -1,0 +1,3 @@
+enum SaltzError {
+    SearchError
+}
