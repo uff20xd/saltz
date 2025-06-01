@@ -1,7 +1,7 @@
 { overlays }:
 
 {
-  nixism = import ./saltz.nix;
+  saltz = import ./saltz.nix;
   overlayNixpkgsForThisInstance =
     { pkgs, ... }:
     {
