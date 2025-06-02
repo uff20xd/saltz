@@ -1,17 +1,18 @@
 mod finder;
 mod error;
 use std::{
-    env::{current_exe, set_current_dir}, process::Command, str
+    env::{current_exe, set_current_dir}, io, process::{exit, Command}, str
 };
 use users::*;
 use finder::recursive_search::*;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-
-    //let test = set_current_dir("");
-    println!("{:?}", current_exe());
-    loop {
-        print!("a");
-    }
-    Ok(())
+    //let mut neovim_command = Command::new("nvim");
+    //let mut neovim = neovim_command.arg("src/main.rs").spawn()?;
+    //let _ = neovim.wait();
+    let test = get_home_directory()+"/programming/nixism";
+    let mut tmux_command = Command::new("tmux");
+    let mut tmux= tmux_command.current_dir(test).spawn()?;
+    let _ = tmux.wait();
+    exit(69);
 }
