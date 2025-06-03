@@ -21,8 +21,9 @@
       overlays.default = final: prev: { saltz = final.callPackage ./package.nix { }; };
 
       packages = forAllSystems (system: {
-        default = pkgsFor.${system}.saltz;
-        saltz = pkgsFor.${system}.saltz;
+        default = self.packages.${system}.saltz;
+        saltz = pkgsFor.callPackage ./nix/saltz.nix;
+        saltz_unwrapped = pkgsFor.callPackage ./nix/saltz_unwrapped.nix;
       });
 
       nixosModules = import ./modules { overlays = overlayList; };
