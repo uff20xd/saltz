@@ -20,7 +20,6 @@ in
   echo $out
   ln -s ${saltz_unwrapped}/share $out/share
   ln -s ${saltz_unwrapped}/bin/saltz $out/bin/saltz
-  makeWrapper ${saltz_unwrapped}/bin/saltz $out/bin/saltz
 ''
 
 #with lib;
