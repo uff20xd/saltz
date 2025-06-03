@@ -11,8 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let mut neovim = neovim_command.arg("src/main.rs").spawn()?;
     //let _ = neovim.wait();
     let test = get_home_directory()+"/programming/nixism";
-    let mut tmux_command = Command::new("tmux");
-    let mut tmux= tmux_command.current_dir(test).spawn()?;
+    let mut tmux_command = Command::new("cd");
+    let mut tmux= tmux_command.arg(test).spawn()?;
     let _ = tmux.wait();
     exit(69);
 }

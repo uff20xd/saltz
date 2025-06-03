@@ -18,12 +18,12 @@
       overlayList = [ self.overlays.default ];
     in {
 
-      overlays.default = final: prev: { saltz = final.callPackage ./package.nix { }; };
+      overlays.default = final: prev: { saltz = final.callPackage ./nix/saltz.nix { }; saltz_unwrapped = final.callPackage ./nix/saltz_unwrapped.nix { }; };
 
       packages = forAllSystems (system: {
-        default = self.packages.${system}.saltz;
-        saltz = pkgsFor.callPackage ./nix/saltz.nix;
-        saltz_unwrapped = pkgsFor.callPackage ./nix/saltz_unwrapped.nix;
+        default = pkgsFor.${system}.saltz;
+        saltz = pkgsFor.${system}.saltz;
+        saltz_unwrapped = pkgsFor.${system}.saltz_unwrapped;
       });
 
       nixosModules = import ./modules { overlays = overlayList; };
