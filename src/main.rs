@@ -11,7 +11,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let mut neovim = neovim_command.arg("src/main.rs").spawn()?;
     //let _ = neovim.wait();
     let test = get_home_directory()+"/programming/selfanl";
-    let mut tmux_command = Command::new("cd");
-    let mut tmux= tmux_command.current_dir("/").arg(test).output()?;
+    print!("works");
     exit(69);
 }

@@ -17,10 +17,12 @@ in
 }
 ''
   mkdir -p $out/bin 
-  echo $out
   ln -s ${saltz_unwrapped}/share $out/share
-  ln -s ${saltz_unwrapped}/bin/saltz $out/bin/saltz
+  ln -s ${saltz_unwrapped}/bin/saltz_unwrapped $out/bin/saltz_unwrapped 
+  makeWrapper ${saltz_unwrapped}/bin/saltz $out/bin/saltz --prefix PATH : "${pkgs.zsh}"
 ''
+
+
 
 #with lib;
 #let
