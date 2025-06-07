@@ -1,51 +1,100 @@
 use core::str;
 use std::{
-    env, fs::*, io::Write, path::{self, *}, process::{
+    fs::{self, *}, io::Write, path::{self, *}, process::{
         Command, Output,
-    }
+    },
 };
-use serde::{Serialize, Deserialize};
-
-
+use serde_derive::{Serialize, Deserialize};
 use users::*;
+
 use crate::error::SaltzError;
 
 const FILE_ENDING: &[u8] = b".slz";
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 struct Project (String, String);
 
 impl Project {
     fn new (name: String, path: String) -> Self {
         Self(name, path)
     }
+    fn get (&self) -> [String; 2] {
+        [self.0.clone(), self.1.clone()]
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Projects(Vec<Project>);
 
 impl Projects {
     pub fn new() -> Self {
         Self(Vec::new())
     }
-    pub fn query() -> Result<(), SaltzError> {
+    pub fn query() -> Self {
+        let mut projects = Self::new();
+        let _ = projects.set_projects(Self::search_directory(get_home_directory()));
+        let _ = projects.save_projects();
+        projects
+    }
+    pub fn get_project_path(name: String) -> Result<String, SaltzError>{
+        let projects = Self::get_paths().get_vec();
+        let mut current_project: [String; 2];
 
-        Ok(())
+        for mut current_name in projects {
+            current_project = current_name.get();
+            if current_project[0] == name {
+                return Ok(current_project[1].clone());
+            }
+        }
+        Err(SaltzError::SearchError)
+
     }
-    pub fn get_files (&mut self) -> () {
-        self.0 = Projects::search_directory(get_home_directory())
+
+    fn set_projects(&mut self, p: Vec<Project>) -> () {
+        self.0 = p;
     }
+
+    fn get_vec(self) -> Vec<Project> {
+        self.0
+    }
+
     fn save_projects(&mut self) -> () {
-        //opens local file and writes all projects and paths into it
+
+        let projects = self.clone();
+        let homedirectory = get_home_directory();
+        if !Path::new(&(homedirectory.clone() + "/.config/saltz/.projects.ron")).exists() {
+            let output = fs::create_dir(homedirectory.clone() + "/.config/saltz");
+        } 
+        let mut projects_file = File::create(homedirectory.clone() + "/.config/saltz/.projects.ron")
+            .expect("new config file in load setting");
+        let new_config_file_contents = ron::to_string::<Projects>(&projects);
+        let _ = write!(projects_file, "{}", new_config_file_contents.unwrap());
+
     }
-    fn get_paths(&mut self) -> (){
+
+    fn get_paths() -> Self {
         //get all the files and paths from the "database"
+        let homedirectory = get_home_directory();
+        let projects_file: String;
+
+        // if the file exists it just reads from it
+        if Path::new(&(homedirectory.clone() + "/.config/saltz/.projects.ron")).exists() {
+            projects_file = fs::read_to_string( homedirectory.clone() + "/.config/saltz/.projects.ron")
+                .expect("Couldnt read the settings file");
+
+            ron::from_str(&projects_file)
+                .expect("couldnt Deserialize the Config object")
+        }
+        // If the File doesnt exist yet it will be created 
+        else {
+            Self::query()
+        }
     }
     //searches all non-hidden files
     fn search_directory (path: String) -> Vec<Project> {
         let mut projects: Vec<Project> = Vec::new();
         let mut list_command: Command = Command::new("ls");
-        #[path = "../../LICENSE"]
+        println!("{:?}", &path);
         let raw_output: Output = list_command.current_dir(&path).output().expect("This command should work usually");
         let output: Vec<u8> = raw_output.stdout;
         let mut slice_start: usize = 0;
@@ -66,7 +115,7 @@ impl Projects {
                     }
                     let file_name = path.clone() + "/" + str::from_utf8(&output[slice_start..(slice_end)]).unwrap();
                     let file = Path::new(&file_name);
-                    dbg!(&file);
+                    //dbg!(&file);
                     if file.is_dir() {
                         let mut projects_in_dir = Projects::search_directory(file_name);
                         projects.append(&mut projects_in_dir);
@@ -77,7 +126,7 @@ impl Projects {
                 _ => ()
             };
         }
-    
+
         projects
     }
 }
@@ -88,5 +137,3 @@ pub fn get_home_directory () -> String {
         .expect("couldnt convert username to a string");
     ("/home/").to_string() + current_user
 }
-
-
