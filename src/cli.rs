@@ -34,7 +34,7 @@ pub fn start_cli () -> () {
             };
             dbg!(&path);
             let mut nvim = Command::new("nvim");
-            let mut nvim_process = nvim.current_dir(&path).spawn().unwrap();
+            let mut nvim_process = nvim.current_dir(&path).arg(".").spawn().unwrap();
             let _ = nvim_process.wait();
         }
     }
