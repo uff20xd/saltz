@@ -1,13 +1,11 @@
 use core::str;
 use std::{
-    path::*,
-    process::{
+    env, fs::*, io::Write, path::{self, *}, process::{
         Command, Output,
-    },
-    fs::*,
-    env,
-    io::Write
+    }
 };
+use serde::{Serialize, Deserialize};
+
 
 use users::*;
 use crate::error::SaltzError;
@@ -30,19 +28,24 @@ impl Projects {
     pub fn new() -> Self {
         Self(Vec::new())
     }
+    pub fn query() -> Result<(), SaltzError> {
+
+        Ok(())
+    }
     pub fn get_files (&mut self) -> () {
         self.0 = Projects::search_directory(get_home_directory())
     }
-    pub fn save_paths(&mut self) -> () {
+    fn save_projects(&mut self) -> () {
         //opens local file and writes all projects and paths into it
     }
-    pub fn get_paths(&mut self) -> (){
+    fn get_paths(&mut self) -> (){
         //get all the files and paths from the "database"
     }
     //searches all non-hidden files
     fn search_directory (path: String) -> Vec<Project> {
         let mut projects: Vec<Project> = Vec::new();
         let mut list_command: Command = Command::new("ls");
+        #[path = "../../LICENSE"]
         let raw_output: Output = list_command.current_dir(&path).output().expect("This command should work usually");
         let output: Vec<u8> = raw_output.stdout;
         let mut slice_start: usize = 0;
@@ -85,6 +88,5 @@ pub fn get_home_directory () -> String {
         .expect("couldnt convert username to a string");
     ("/home/").to_string() + current_user
 }
-
 
 
