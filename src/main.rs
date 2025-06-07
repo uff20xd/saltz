@@ -12,7 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let _ = neovim.wait();
     let test = get_home_directory()+"/programming/selfanl";
     let mut test2 = Projects::new();
-    test2.save_paths();
-    print!("works");
+    test2.get_files();
+    println!("{:?}", test2);
     exit(69);
 }

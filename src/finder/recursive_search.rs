@@ -12,8 +12,18 @@ use std::{
 use users::*;
 use crate::error::SaltzError;
 
-struct Project (String, PathBuf);
+const FILE_ENDING: &[u8] = b".slz";
 
+#[derive(Debug)]
+struct Project (String, String);
+
+impl Project {
+    fn new (name: String, path: String) -> Self {
+        Self(name, path)
+    }
+}
+
+#[derive(Debug)]
 pub struct Projects(Vec<Project>);
 
 impl Projects {
@@ -21,45 +31,50 @@ impl Projects {
         Self(Vec::new())
     }
     pub fn get_files (&mut self) -> () {
-    }
-    fn format (paths: Vec<PathBuf>) -> Result<Vec<Project>, SaltzError> {
-        let mut projects: Vec<Project> = Vec::new();
-        for i in paths {
-        }
-        Ok(projects)
+        self.0 = Projects::search_directory(get_home_directory())
     }
     pub fn save_paths(&mut self) -> () {
         //opens local file and writes all projects and paths into it
-        let out_dir = env::var("OUT_DIR").unwrap();
-        let dest_path = Path::new(&out_dir).join("hello.rs");
-        let mut f = File::create(&dest_path).unwrap();
-        f.write_all(b"fn main() {println!(\"Unerwartetes hallo\")}").unwrap()
     }
     pub fn get_paths(&mut self) -> (){
         //get all the files and paths from the "database"
     }
-}
-fn search_directory (path: PathBuf, hidden_files: bool) -> Vec<PathBuf> {
-    let mut directories: Vec<PathBuf> = Vec::new();
-    let mut list_command: Command = Command::new("ls");
-    let raw_output: Output = list_command.output().expect("This command should work usually");
-    let output: Vec<u8> = raw_output.stdout;
-    let mut slice_start: usize = 0;
-    let mut slice_end: usize = 0;
-    let mut files: Vec<String> = Vec::new();
-    while output.len()-1 >= slice_end {
-        slice_end += 1;
-        let _  = match output[slice_end] {
-            b' ' => {
-                let file = str::from_utf8(&output[slice_start..slice_end]).expect("should be a string in string in search directory").to_owned();
-                files.push(file);
-                slice_start = slice_end;
-            },
-            _ => ()
-        };
+    //searches all non-hidden files
+    fn search_directory (path: String) -> Vec<Project> {
+        let mut projects: Vec<Project> = Vec::new();
+        let mut list_command: Command = Command::new("ls");
+        let raw_output: Output = list_command.output().expect("This command should work usually");
+        let output: Vec<u8> = raw_output.stdout;
+        let mut slice_start: usize = 0;
+        let mut slice_end: usize = 0;
+        while output.len()-2 >= slice_end {
+            slice_end += 1;
+            let _  = match output[slice_end] {
+                b' ' => {
+                    let len = (slice_end - slice_start) - 1;
+                    if len > 5 {
+                        let _ = match &output[(len - 4)..len] {
+                            FILE_ENDING => {
+                                projects.push(Project::new(str::from_utf8(&output[0..(len-4)]).unwrap().to_owned(), path.clone()));
+                                return projects;
+                            },
+                            _ => ()
+                        };
+                    }
+                    let file_name = path.clone() + str::from_utf8(&output[0..len]).unwrap();
+                    let file = Path::new(&file_name);
+                    if file.is_dir() {
+                        let mut projects_in_dir = Projects::search_directory(file_name);
+                        projects.append(&mut projects_in_dir);
+                    }
+                    slice_start = slice_end;
+                },
+                _ => ()
+            };
+        }
+    
+        projects
     }
-
-    directories
 }
 pub fn get_home_directory () -> String {
     let current_user_as_osstring = get_current_username()
