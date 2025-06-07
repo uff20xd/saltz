@@ -1,5 +1,5 @@
 {
-  description = "Foo Bar";
+  description = " A Project Manager of the worst sort";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
   };
