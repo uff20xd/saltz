@@ -94,7 +94,7 @@ impl Projects {
     fn search_directory (path: String) -> Vec<Project> {
         let mut projects: Vec<Project> = Vec::new();
         let mut list_command: Command = Command::new("ls");
-        println!("{:?}", &path);
+        //println!("{:?}", &path);
         let raw_output: Output = list_command.current_dir(&path).output().expect("This command should work usually");
         let output: Vec<u8> = raw_output.stdout;
         let mut slice_start: usize = 0;
