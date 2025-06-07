@@ -43,30 +43,32 @@ impl Projects {
     fn search_directory (path: String) -> Vec<Project> {
         let mut projects: Vec<Project> = Vec::new();
         let mut list_command: Command = Command::new("ls");
-        let raw_output: Output = list_command.output().expect("This command should work usually");
+        let raw_output: Output = list_command.current_dir(&path).output().expect("This command should work usually");
         let output: Vec<u8> = raw_output.stdout;
         let mut slice_start: usize = 0;
         let mut slice_end: usize = 0;
-        while output.len()-2 >= slice_end {
+        while output.len() >= slice_end + 2 {
             slice_end += 1;
             let _  = match output[slice_end] {
-                b' ' => {
-                    let len = (slice_end - slice_start) - 1;
+                b'\n' => {
+                    let len = (slice_end - 1) - slice_start;
                     if len > 5 {
-                        let _ = match &output[(len - 4)..len] {
+                        let _ = match &output[(slice_end - 4)..(slice_end)] {
                             FILE_ENDING => {
-                                projects.push(Project::new(str::from_utf8(&output[0..(len-4)]).unwrap().to_owned(), path.clone()));
+                                projects.push(Project::new(str::from_utf8(&output[slice_start..(slice_end-4)]).unwrap().to_owned(), path.clone()));
                                 return projects;
                             },
                             _ => ()
                         };
                     }
-                    let file_name = path.clone() + str::from_utf8(&output[0..len]).unwrap();
+                    let file_name = path.clone() + "/" + str::from_utf8(&output[slice_start..(slice_end)]).unwrap();
                     let file = Path::new(&file_name);
+                    dbg!(&file);
                     if file.is_dir() {
                         let mut projects_in_dir = Projects::search_directory(file_name);
                         projects.append(&mut projects_in_dir);
                     }
+                    slice_end += 1;
                     slice_start = slice_end;
                 },
                 _ => ()
