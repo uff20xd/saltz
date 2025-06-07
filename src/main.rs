@@ -11,6 +11,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     //let mut neovim = neovim_command.arg("src/main.rs").spawn()?;
     //let _ = neovim.wait();
     let test = get_home_directory()+"/programming/selfanl";
+    let mut test2 = Projects::new();
+    test2.save_paths();
     print!("works");
     exit(69);
 }

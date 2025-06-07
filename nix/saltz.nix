@@ -19,7 +19,7 @@ in
   mkdir -p $out/bin 
   ln -s ${saltz_unwrapped}/share $out/share
   ln -s ${saltz_unwrapped}/bin/saltz_unwrapped $out/bin/saltz_unwrapped 
-  makeWrapper ${saltz_unwrapped}/bin/saltz $out/bin/saltz --prefix PATH : "${pkgs.zsh}"
+  makeWrapper ${saltz_unwrapped}/bin/saltz $out/bin/saltz
 ''
 
 

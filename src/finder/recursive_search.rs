@@ -1,10 +1,14 @@
 use core::str;
 use std::{
-    path::PathBuf,
+    path::*,
     process::{
         Command, Output,
     },
+    fs::*,
+    env,
+    io::Write
 };
+
 use users::*;
 use crate::error::SaltzError;
 
@@ -26,6 +30,10 @@ impl Projects {
     }
     pub fn save_paths(&mut self) -> () {
         //opens local file and writes all projects and paths into it
+        let out_dir = env::var("OUT_DIR").unwrap();
+        let dest_path = Path::new(&out_dir).join("hello.rs");
+        let mut f = File::create(&dest_path).unwrap();
+        f.write_all(b"fn main() {println!(\"Unerwartetes hallo\")}").unwrap()
     }
     pub fn get_paths(&mut self) -> (){
         //get all the files and paths from the "database"

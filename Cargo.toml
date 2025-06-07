@@ -2,7 +2,10 @@
 name = "saltz"
 version = "0.1.0"
 edition = "2024"
+build = "build.rs"
 
 [dependencies]
 clap = "4.5.39"
 users = "0.11.0"
+
+
