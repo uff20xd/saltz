@@ -7,8 +7,6 @@ use std::{
 use serde_derive::{Serialize, Deserialize};
 use users::*;
 
-use crate::error::SaltzError;
-
 const FILE_ENDING: &[u8] = b".slz";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -44,7 +42,7 @@ impl Projects {
             println!("Project: {} ; Path: {}", current_project[0], current_project[1]);
         }
     }
-    pub fn get_project_path(name: String) -> Result<String, SaltzError>{
+    pub fn get_project_path(name: String) -> Result<String, ()>{
         let projects = Self::load_projects().get_vec();
         let mut current_project: [String; 2];
 
@@ -54,7 +52,7 @@ impl Projects {
                 return Ok(current_project[1].clone());
             }
         }
-        Err(SaltzError::SearchError)
+        Err(())
     }
 
     fn set_projects(&mut self, p: Vec<Project>) -> () {

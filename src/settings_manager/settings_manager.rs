@@ -9,11 +9,13 @@ use serde_derive::{Serialize, Deserialize};
 #[derive(Serialize, Deserialize)]
 pub struct Settings {
     editor: String,
+    test: String
 }
 impl Settings {
     fn new () -> Self {
         Self {
             editor: "nvim".to_owned(),
+            test: "".to_owned(),
         }
     }
     pub fn set_settings_value(setting: &String, new_value: &String) -> () {
@@ -21,6 +23,9 @@ impl Settings {
         let _ = match setting as &str {
             "editor" => {
                 settings.editor = new_value.clone();
+            },
+            "test" => {
+                settings.test = new_value.clone();
             },
             _ => {
                 println!("Setting \"{}\" not found.", setting.clone());
@@ -33,6 +38,7 @@ impl Settings {
         let settings = Self::load_settings();
         match setting {
             "editor" => settings.editor,
+            "test" => settings.test,
             _ => "".to_owned()
         }
     }

@@ -1,5 +1,4 @@
 mod project_management;
-mod error;
 mod cli;
 mod settings_manager;
 mod script_handler;
@@ -15,8 +14,10 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::project_management::project_management::*;
-    use std::process::exit;
+
+    use crate::{project_management::project_management::*, settings_manager::settings_manager::Settings};
+    use core::str;
+    use std::process::{exit, Command};
     #[test]
     fn search_directory() {
         let homedirectory = get_home_directory();
@@ -39,5 +40,30 @@ mod tests {
             Ok(n) => n,
             Err(_) => exit(99)
         };
+    }
+
+    #[test]
+    fn settings_test() {
+        let homedirectory = get_home_directory();
+        if homedirectory == "/home/nixbld" {
+            exit(0)
+        }
+
+        let mut command = Command::new("rm");
+        let file = get_home_directory() + "/.config/saltz/config.toml";
+        let output = command.arg(&file).output().unwrap().stdout;
+        println!("rm output: {}", str::from_utf8(&output).unwrap());
+
+        let name = "test".to_owned();
+
+        let new_value = "test_string123".to_owned();
+        let _ = Settings::set_settings_value(&name, &new_value);
+        let test_setting = Settings::get_setting_value("test");
+        assert!(test_setting=="test_string123".to_owned());
+
+        let new_value = "other_string".to_owned();
+        let _ = Settings::set_settings_value(&name, &new_value);
+        let test_setting = Settings::get_setting_value("test");
+        assert!(test_setting=="other_string".to_owned());
     }
 }
