@@ -8,6 +8,9 @@ struct Cli {
     /// Enter a Command
     #[command(subcommand)]
     command: CliArgs,
+
+    #[arg(long)]
+    name: String,
 }
 
 #[derive(Subcommand, Debug)]
@@ -18,7 +21,9 @@ enum CliArgs{
         name: String
     },
     /// Searches all Projects in Home
-    Search 
+    Search,
+
+    Get
 }
 
 pub fn start_cli () -> () {
@@ -38,6 +43,9 @@ pub fn start_cli () -> () {
             let mut nvim = Command::new("nvim");
             let mut nvim_process = nvim.current_dir(&path).arg(".").spawn().unwrap();
             let _ = nvim_process.wait();
-        }
+        },
+        CliArgs::Get => {
+            let path = Projects::get_all_paths();
+        },
     }
 }
