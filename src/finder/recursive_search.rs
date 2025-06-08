@@ -1,6 +1,6 @@
 use core::str;
 use std::{
-    fs::{self, *}, io::Write, path::{self, *}, process::{
+    fs::{self, *}, io::Write, path::{*}, process::{
         Command, Output,
     },
 };
@@ -34,7 +34,6 @@ impl Projects {
         let mut projects = Self::new();
         let _ = projects.set_projects(Self::search_directory(get_home_directory()));
         let _ = projects.save_projects();
-        println!("fuck");
         projects
     }
     pub fn get_project_path(name: String) -> Result<String, SaltzError>{
@@ -42,7 +41,7 @@ impl Projects {
         let mut current_project: [String; 2];
 
         println!("fuck 2");
-        for mut current_name in projects {
+        for current_name in projects {
             current_project = current_name.get();
             if current_project[0] == name {
                 return Ok(current_project[1].clone());
@@ -65,7 +64,7 @@ impl Projects {
         let projects = self.clone();
         let homedirectory = get_home_directory();
         if !Path::new(&(homedirectory.clone() + "/.config/saltz/.projects.ron")).exists() {
-            let output = fs::create_dir(homedirectory.clone() + "/.config/saltz");
+            let _ = fs::create_dir(homedirectory.clone() + "/.config/saltz");
         } 
         let mut projects_file = File::create(homedirectory.clone() + "/.config/saltz/.projects.ron")
             .expect("new config file in load setting");

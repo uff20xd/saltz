@@ -1,5 +1,5 @@
 use clap::{command, Parser, Subcommand};
-use std::process::{self, exit, Command, Output};
+use std::process::{exit, Command};
 use crate::finder::recursive_search::Projects;
 
 #[derive(Parser, Debug)]
@@ -25,7 +25,7 @@ pub fn start_cli () -> () {
     let cli = Cli::parse();
     match &cli.command {
         CliArgs::Search => {
-            let output = Projects::query();
+            let _output = Projects::query();
         },
         CliArgs::Enter { name } => {
             let path = match Projects::get_project_path(name.clone()) {
@@ -36,9 +36,6 @@ pub fn start_cli () -> () {
             let mut nvim = Command::new("nvim");
             let mut nvim_process = nvim.current_dir(&path).arg(".").spawn().unwrap();
             let _ = nvim_process.wait();
-        },
-        _ => {
-            exit(99)
         }
     }
 }
