@@ -3,26 +3,18 @@ mod error;
 mod cli;
 use cli::*;
 use std::{
-    fs::{self, *}, io::*, path::Path, process::{exit, Command, Output}, str
+    process::{exit}, 
 };
-use finder::recursive_search::*;
 
 fn main() {
-    init();
     start_cli();
     exit(0);
 }
 
-fn init() {
-    let homedirectory = get_home_directory();
-    if !Path::new(&(homedirectory.clone() + "/.config/saltz/.projects.toml")).exists() {
-        let projects = Projects::query();
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use crate::finder::recursive_search::*;
+    use std::process::exit;
     #[test]
     fn search_directory() {
         let homedirectory = get_home_directory();
@@ -30,9 +22,7 @@ mod tests {
         if homedirectory == "/home/nixbld" {
             exit(0)
         }
-        init();
-        let mut projects = Projects::query();
-        dbg!(projects);
+        let _ = Projects::query();
     }
 
     #[test]
@@ -42,13 +32,10 @@ mod tests {
         if homedirectory == "/home/nixbld" {
             exit(0)
         }
-        init();
-        let mut projects = Projects::query();
-        let mut project_path = match Projects::get_project_path("saltz".to_owned()) {
+        let _ = Projects::query();
+        let _ = match Projects::get_project_path("saltz".to_owned()) {
             Ok(n) => n,
             Err(_) => exit(99)
         };
-        dbg!(projects);
-        dbg!(project_path);
     }
 }

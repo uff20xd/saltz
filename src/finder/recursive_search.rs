@@ -34,12 +34,14 @@ impl Projects {
         let mut projects = Self::new();
         let _ = projects.set_projects(Self::search_directory(get_home_directory()));
         let _ = projects.save_projects();
+        println!("fuck");
         projects
     }
     pub fn get_project_path(name: String) -> Result<String, SaltzError>{
         let projects = Self::get_paths().get_vec();
         let mut current_project: [String; 2];
 
+        println!("fuck 2");
         for mut current_name in projects {
             current_project = current_name.get();
             if current_project[0] == name {
