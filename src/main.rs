@@ -1,6 +1,7 @@
 mod finder;
 mod error;
 mod cli;
+mod settings_manager;
 use cli::*;
 use std::{
     process::{exit}, 
