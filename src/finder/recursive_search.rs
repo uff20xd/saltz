@@ -108,7 +108,9 @@ impl Projects {
                     if len > 5 {
                         let _ = match &output[(slice_end - 4)..(slice_end)] {
                             FILE_ENDING => {
-                                projects.push(Project::new(str::from_utf8(&output[slice_start..(slice_end-4)]).unwrap().to_owned(), path.clone()));
+                                let name = str::from_utf8(&output[slice_start..(slice_end-4)]).unwrap().to_owned();
+                                projects.push(Project::new(name.clone(), path.clone()));
+                                println!("Project: {} ; Path: {}", name, path.clone());
                                 return projects;
                             },
                             _ => ()
