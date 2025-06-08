@@ -1,4 +1,4 @@
-mod finder;
+mod project_management;
 mod error;
 mod cli;
 mod settings_manager;
@@ -14,7 +14,7 @@ fn main() {
 
 #[cfg(test)]
 mod tests {
-    use crate::finder::recursive_search::*;
+    use crate::project_management::project_management::*;
     use std::process::exit;
     #[test]
     fn search_directory() {

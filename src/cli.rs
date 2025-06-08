@@ -1,6 +1,6 @@
 use clap::{command, Parser, Subcommand};
 use std::process::{exit, Command};
-use crate::project_management::recursive_search::Projects;
+use crate::project_management::project_management::Projects;
 use crate::settings_manager::settings_manager::Settings;
 
 #[derive(Parser, Debug)]
