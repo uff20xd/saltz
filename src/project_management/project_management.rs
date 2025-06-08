@@ -114,7 +114,7 @@ impl Projects {
                             FILE_ENDING => {
                                 let name = str::from_utf8(&output[slice_start..(slice_end-4)]).unwrap().to_owned();
                                 projects.push(Project::new(name.clone(), path.clone()));
-                                println!("Project: {} ; Path: {}", name, path.clone());
+                                println!("{} ; {}", name, path.clone());
                                 return projects;
                             },
                             _ => ()
