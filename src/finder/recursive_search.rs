@@ -40,7 +40,6 @@ impl Projects {
         let projects = Self::get_paths().get_vec();
         let mut current_project: [String; 2];
 
-        println!("fuck 2");
         for current_name in projects {
             current_project = current_name.get();
             if current_project[0] == name {

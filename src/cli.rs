@@ -30,9 +30,11 @@ pub fn start_cli () -> () {
         CliArgs::Enter { name } => {
             let path = match Projects::get_project_path(name.clone()) {
                 Ok(heh) => heh,
-                Err(_) => exit(99)
+                Err(_) => {
+                    println!("No Project with the name: {}.", name);
+                    exit(99)
+                }
             };
-            dbg!(&path);
             let mut nvim = Command::new("nvim");
             let mut nvim_process = nvim.current_dir(&path).arg(".").spawn().unwrap();
             let _ = nvim_process.wait();
