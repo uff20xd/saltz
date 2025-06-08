@@ -36,14 +36,13 @@ impl Projects {
         let _ = projects.save_projects();
         projects
     }
-    pub fn get_all_paths() -> Vec<Project> {
+    pub fn get_all_paths() -> () {
         let projects = Self::load_projects().get_vec();
-        projects
-        //let mut current_project: [String; 2];
-        //for current_name in projects {
-        //    current_project = current_name.get();
-        //    println!("Project: {} ; Path: {}", current_project[0], current_project[1]);
-        //}
+        let mut current_project: [String; 2];
+        for current_name in projects {
+            current_project = current_name.get();
+            println!("Project: {} ; Path: {}", current_project[0], current_project[1]);
+        }
     }
     pub fn get_project_path(name: String) -> Result<String, SaltzError>{
         let projects = Self::load_projects().get_vec();

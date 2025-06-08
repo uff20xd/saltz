@@ -9,8 +9,6 @@ struct Cli {
     #[command(subcommand)]
     command: CliArgs,
 
-    #[arg(long)]
-    name: String,
 }
 
 #[derive(Subcommand, Debug)]
@@ -23,7 +21,10 @@ enum CliArgs{
     /// Searches all Projects in Home
     Search,
 
-    Get
+    Get {
+        #[arg(long, default_value_t = ("").to_owned() )]
+        name: String,
+    }
 }
 
 pub fn start_cli () -> () {
@@ -44,8 +45,19 @@ pub fn start_cli () -> () {
             let mut nvim_process = nvim.current_dir(&path).arg(".").spawn().unwrap();
             let _ = nvim_process.wait();
         },
-        CliArgs::Get => {
-            let path = Projects::get_all_paths();
+        CliArgs::Get {name} => {
+            if name == "" {
+                let _ = Projects::get_all_paths();
+            } else {
+                let name = name.clone();
+                let path = match Projects::get_project_path(name){
+                    Ok(heh ) => heh,
+                    Err(_) => {
+                        exit(99)
+                    }
+                };
+                print!("{}", path);
+            }
         },
     }
 }
