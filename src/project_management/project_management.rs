@@ -39,7 +39,7 @@ impl Projects {
         let mut current_project: [String; 2];
         for current_name in projects {
             current_project = current_name.get();
-            println!("Project: {} ; Path: {}", current_project[0], current_project[1]);
+            println!("{} ; {}", current_project[0], current_project[1]);
         }
     }
     pub fn get_project_path(name: String) -> Result<String, ()>{
