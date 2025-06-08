@@ -15,7 +15,7 @@ impl Settings {
     fn new () -> Self {
         Self {
             editor: "nvim".to_owned(),
-            test: "".to_owned(),
+            test: "ballball".to_owned(),
         }
     }
     pub fn set_settings_value(setting: &String, new_value: &String) -> () {
