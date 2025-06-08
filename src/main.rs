@@ -2,6 +2,7 @@ mod project_management;
 mod error;
 mod cli;
 mod settings_manager;
+mod script_handler;
 use cli::*;
 use std::{
     process::{exit}, 
