@@ -36,8 +36,16 @@ impl Projects {
         let _ = projects.save_projects();
         projects
     }
+    pub fn get_all_paths() -> () {
+        let projects = Self::load_projects().get_vec();
+        let mut current_project: [String; 2];
+        for current_name in projects {
+            current_project = current_name.get();
+            println!("Project: {} ; Path: {}", current_project[0], current_project[1]);
+        }
+    }
     pub fn get_project_path(name: String) -> Result<String, SaltzError>{
-        let projects = Self::get_paths().get_vec();
+        let projects = Self::load_projects().get_vec();
         let mut current_project: [String; 2];
 
         for current_name in projects {
@@ -47,7 +55,6 @@ impl Projects {
             }
         }
         Err(SaltzError::SearchError)
-
     }
 
     fn set_projects(&mut self, p: Vec<Project>) -> () {
@@ -72,7 +79,7 @@ impl Projects {
 
     }
 
-    fn get_paths() -> Self {
+    fn load_projects() -> Self {
         //get all the files and paths from the "database"
         let homedirectory = get_home_directory();
         let projects_file: String;
