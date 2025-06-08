@@ -1,6 +1,6 @@
 use clap::{command, Parser, Subcommand};
 use std::process::{exit, Command};
-use crate::finder::recursive_search::Projects;
+use crate::project_management::recursive_search::Projects;
 use crate::settings_manager::settings_manager::Settings;
 
 #[derive(Parser, Debug)]
@@ -29,6 +29,12 @@ enum CliArgs{
     Config {
         setting: String,
         new_value: String
+    },
+    Run {
+        script: String,
+
+        #[arg(long, default_value_t = (".").to_owned() )]
+        path: String,
     }
 }
 
@@ -67,6 +73,9 @@ pub fn start_cli () -> () {
         },
         CliArgs::Config { setting, new_value } => {
             Settings::set_settings_value(setting, new_value);
+        },
+        CliArgs::Run { script, path } => {
+            print!("{}{}", script, path);
         }
     }
 }
