@@ -36,7 +36,7 @@ impl Projects {
         let mut project_path: PathBuf;
         for current_project in projects {
             (project_name, project_path) = current_project.get();
-            println!("{:<20}: {}", project_name, project_path.display());
+            println!("{:<20} {}", project_name, project_path.display());
         }
         Ok(())
     }
@@ -134,7 +134,7 @@ impl Projects {
             // println!("{:>10}: {:?}, {:?}", &true_name, slz_test, FILE_ENDING);
             if FILE_ENDING == slz_test {
                 let project_name = true_name[..true_name.len()-4].to_owned();
-                println!("{:<20}: {}", &project_name, file_path.display());
+                println!("{:<20} {}", &project_name, file_path.display());
                 projects.push(Project::new(project_name, u_file.path()));
             }
         }
