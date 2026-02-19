@@ -58,8 +58,7 @@ pub fn start_cli () -> Result<(), Box<dyn std::error::Error>> {
             };
             let editor = settings.get_setting_value("editor");
             let mut nvim = Command::new(editor);
-            let mut nvim_process = nvim.current_dir(&path).arg(".").spawn().unwrap();
-            let _ = nvim_process.wait();
+            let mut nvim_process = nvim.current_dir(&path).arg(".").status().unwrap();
         },
         CliArgs::Get {name} => {
             if name == "" {

@@ -138,7 +138,7 @@ impl Projects {
             if FILE_ENDING == slz_test {
                 let project_name = true_name[..true_name.len()-4].to_owned();
                 println!("{:<20} {}", &project_name, file_path.display());
-                projects.push(Project::new(project_name, u_file.path()));
+                projects.push(Project::new(project_name, path.to_owned()));
             }
         }
         // println!("H");
