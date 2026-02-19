@@ -43,12 +43,12 @@ enum CliArgs{
 
 pub fn start_cli () -> Result<(), Box<dyn std::error::Error>> {
     let cli = Cli::parse();
-    let mut settings = Settings::load_settings()?;
     match &cli.command {
         CliArgs::Search { hidden } => {
             let _output = Projects::query(*hidden);
         },
         CliArgs::Enter { name } => {
+            let settings = Settings::load_settings()?;
             let path = match Projects::get_project_path(name.clone()) {
                 Ok(heh) => heh,
                 Err(_) => {
@@ -76,20 +76,18 @@ pub fn start_cli () -> Result<(), Box<dyn std::error::Error>> {
             }
         },
         CliArgs::Config { setting, new_value } => {
+            let mut settings = Settings::load_settings()?;
             settings.set_settings_value(setting, new_value);
         },
         CliArgs::Run { script, path } => {
             print!("{}{}", script, path);
         }
         CliArgs::Test => {
-            let directory = std::fs::read_dir("/home/uff20xd")?;
-            let _: Vec<_> = directory
-                .map(|file| {
-                    let u_file = file.unwrap();
-                    println!("file: {}", u_file.path().display())
-                })
-                .collect();
-
+            println!("Load");
+            let projects = Projects::load_projects()?;
+            println!("Save");
+            let _ = Projects::save_projects(&projects);
+            println!("Finish");
         }
     }
     Ok(())

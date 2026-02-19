@@ -26,8 +26,11 @@ impl Projects {
     pub fn query(search_hidden: bool) -> Result<Self, Box<dyn std::error::Error>> {
         let mut projects = Vec::new();
         Self::search_directory(&mut projects, &get_home_directory(), search_hidden)?;
+        // println!("Finish Search");
         let projects = Self(projects);
+        // println!("Finish Obj");
         let _ = projects.save_projects();
+        // println!("Finish Save");
         Ok(projects)
     }
     pub fn get_all_paths() -> Result<(), Box<dyn std::error::Error>> {
@@ -58,7 +61,7 @@ impl Projects {
         self.0
     }
 
-    fn save_projects(&self) -> () {
+    pub fn save_projects(&self) -> () {
 
         let projects = self.clone();
         let mut homedirectory = get_home_directory();
@@ -83,7 +86,7 @@ impl Projects {
 
     }
 
-    fn load_projects() -> Result<Self, Box<dyn std::error::Error>>{
+    pub fn load_projects() -> Result<Self, Box<dyn std::error::Error>>{
         //get all the files and paths from the "database"
         let projects_file: String;
         let mut projects_file_path = get_home_directory();
@@ -103,8 +106,8 @@ impl Projects {
     }
 
     fn search_directory(projects: &mut Vec<Project>, path: &Path, search_hidden: bool) -> Result<(), Box<dyn std::error::Error>> {
-        let mut directory = fs::read_dir(path)?;
-        while let Some(file) = directory.next() {
+        let directory = fs::read_dir(path)?;
+        for file in directory {
             let u_file = file?;
             let file_path = u_file.path();
             let file_name = u_file.file_name();
@@ -122,7 +125,7 @@ impl Projects {
             // println!("{:>10}: {}", file_name.display(), file_path.display());
 
             if file_type.is_dir() {
-                if !(true_name_start == '.') || (search_hidden && true_name.len() >= 1) {
+                if !(true_name_start == '.') {
                     // println!("{:>10}: {}", file_name.display(), file_path.display());
                     Self::search_directory(projects, &file_path, search_hidden)?;
                 } else { continue }
@@ -138,6 +141,7 @@ impl Projects {
                 projects.push(Project::new(project_name, u_file.path()));
             }
         }
+        // println!("H");
         Ok(())
     }
 }
