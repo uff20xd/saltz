@@ -25,7 +25,7 @@ mod tests {
         if homedirectory.as_os_str() == "/home/nixbld" {
             exit(0)
         }
-        let _ = Projects::query();
+        let _ = Projects::query(false);
     }
 
     #[test]
@@ -35,7 +35,7 @@ mod tests {
         if homedirectory.as_os_str() == "/home/nixbld" {
             exit(0)
         }
-        let _ = Projects::query();
+        let _ = Projects::query(false);
         let _ = match Projects::get_project_path("saltz".to_owned()) {
             Ok(n) => n,
             Err(_) => exit(99)

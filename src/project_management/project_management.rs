@@ -23,9 +23,6 @@ impl Project {
 pub struct Projects(Vec<Project>);
 
 impl Projects {
-    pub fn new() -> Self {
-        Self(Vec::new())
-    }
     pub fn query(search_hidden: bool) -> Result<Self, Box<dyn std::error::Error>> {
         let mut projects = Vec::new();
         Self::search_directory(&mut projects, &get_home_directory(), search_hidden)?;
@@ -39,7 +36,7 @@ impl Projects {
         let mut project_path: PathBuf;
         for current_project in projects {
             (project_name, project_path) = current_project.get();
-            println!("{} ; {}", project_name, project_path.display());
+            println!("{:<20}: {}", project_name, project_path.display());
         }
         Ok(())
     }
@@ -137,7 +134,7 @@ impl Projects {
             // println!("{:>10}: {:?}, {:?}", &true_name, slz_test, FILE_ENDING);
             if FILE_ENDING == slz_test {
                 let project_name = true_name[..true_name.len()-4].to_owned();
-                println!("{:>10}: {}", &project_name, file_path.display());
+                println!("{:<20}: {}", &project_name, file_path.display());
                 projects.push(Project::new(project_name, u_file.path()));
             }
         }
