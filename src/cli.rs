@@ -1,4 +1,4 @@
-use clap::{command, Parser, Subcommand};
+use clap::{Parser, Subcommand};
 use std::process::{exit, Command};
 use crate::project_management::project_management::Projects;
 use crate::settings_manager::settings_manager::Settings;

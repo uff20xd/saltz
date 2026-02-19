@@ -6,7 +6,6 @@ use std::{
 };
 use serde_derive::{Serialize, Deserialize};
 use users::*;
-use std::fmt;
 
 const FILE_ENDING: &[u8] = b".slz";
 
@@ -73,7 +72,7 @@ impl Projects {
         } 
         let mut projects_file = File::create(homedirectory.clone() + "/.config/saltz/.projects.ron")
             .expect("new config file in load setting");
-        let new_config_file_contents = ron::to_string::<Projects>(&projects);
+        let new_config_file_contents = toml::to_string::<Projects>(&projects);
         let _ = write!(projects_file, "{}", new_config_file_contents.unwrap());
 
     }
@@ -88,7 +87,7 @@ impl Projects {
             projects_file = fs::read_to_string( homedirectory.clone() + "/.config/saltz/.projects.ron")
                 .expect("Couldnt read the settings file");
 
-            ron::from_str(&projects_file)
+            toml::from_str(&projects_file)
                 .expect("couldnt Deserialize the Config object")
         }
         // If the File doesnt exist yet it will be created 
