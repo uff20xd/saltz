@@ -43,13 +43,13 @@ impl Settings {
         //get all the files and paths from the "database"
         let projects_file: String;
         let mut projects_file_path = get_home_directory();
-        projects_file_path.as_mut_os_string().push("/.config/saltz/config.toml");
+        projects_file_path.as_mut_os_string().push("/.config/saltz/config.ron");
         // if the file exists it just reads from it
         if projects_file_path.exists() {
             projects_file = fs::read_to_string(projects_file_path)
                 .expect("Couldnt read the settings file");
 
-            match toml::from_str(&projects_file) {
+            match ron::from_str(&projects_file) {
                 Ok(this) => { return Ok(this) },
                 Err(err) => { return Err(err.into()) }
             }
@@ -61,12 +61,12 @@ impl Settings {
     }
     fn save_settings (&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let mut projects_file_path = get_home_directory();
-        projects_file_path.as_mut_os_string().push("/.config/saltz/config.toml");
+        projects_file_path.as_mut_os_string().push("/.config/saltz/config.ron");
         if projects_file_path.exists() {
             let _ = fs::create_dir(&projects_file_path);
         } 
         let mut projects_file = File::create(projects_file_path)?;
-        let new_config_file_contents = toml::to_string::<Self>(&self);
+        let new_config_file_contents = ron::to_string::<Self>(&self);
         write!(projects_file, "{}", new_config_file_contents.unwrap())?;
         Ok(())
     }
