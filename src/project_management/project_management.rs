@@ -6,6 +6,7 @@ use std::{
 };
 use serde_derive::{Serialize, Deserialize};
 use users::*;
+use std::fmt;
 
 const FILE_ENDING: &[u8] = b".slz";
 
@@ -42,7 +43,7 @@ impl Projects {
             println!("{} ; {}", current_project[0], current_project[1]);
         }
     }
-    pub fn get_project_path(name: String) -> Result<String, ()>{
+    pub fn get_project_path(name: String) -> Result<String, Box<dyn std::error::Error>>{
         let projects = Self::load_projects().get_vec();
         let mut current_project: [String; 2];
 
@@ -52,7 +53,7 @@ impl Projects {
                 return Ok(current_project[1].clone());
             }
         }
-        Err(())
+        Err(Box::new(std::fmt::Error))
     }
 
     fn set_projects(&mut self, p: Vec<Project>) -> () {
