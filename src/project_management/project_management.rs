@@ -1,23 +1,21 @@
-use core::str;
 use std::{
-    fs::{self, *}, io::Write, path::{*}, process::{
-        Command, Output,
-    },
+    fs::{self, *}, io::Write, path::{*},
 };
 use serde_derive::{Serialize, Deserialize};
 use users::*;
-
+// use ron::ser::Error;
+//
 const FILE_ENDING: &[u8] = b".slz";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-struct Project (String, String);
+struct Project (String, PathBuf);
 
 impl Project {
-    fn new (name: String, path: String) -> Self {
+    fn new (name: String, path: PathBuf) -> Self {
         Self(name, path)
     }
-    fn get (&self) -> [String; 2] {
-        [self.0.clone(), self.1.clone()]
+    fn get (&self) -> (String, PathBuf) {
+        (self.0.clone(), self.1.clone())
     }
 }
 
@@ -28,119 +26,129 @@ impl Projects {
     pub fn new() -> Self {
         Self(Vec::new())
     }
-    pub fn query() -> Self {
-        let mut projects = Self::new();
-        let _ = projects.set_projects(Self::search_directory(get_home_directory()));
+    pub fn query(search_hidden: bool) -> Result<Self, Box<dyn std::error::Error>> {
+        let mut projects = Vec::new();
+        Self::search_directory(&mut projects, &get_home_directory(), search_hidden)?;
+        let projects = Self(projects);
         let _ = projects.save_projects();
-        projects
+        Ok(projects)
     }
-    pub fn get_all_paths() -> () {
-        let projects = Self::load_projects().get_vec();
-        let mut current_project: [String; 2];
-        for current_name in projects {
-            current_project = current_name.get();
-            println!("{} ; {}", current_project[0], current_project[1]);
+    pub fn get_all_paths() -> Result<(), Box<dyn std::error::Error>> {
+        let projects = Self::load_projects()?.get_vec();
+        let mut project_name: String;
+        let mut project_path: PathBuf;
+        for current_project in projects {
+            (project_name, project_path) = current_project.get();
+            println!("{} ; {}", project_name, project_path.display());
         }
+        Ok(())
     }
-    pub fn get_project_path(name: String) -> Result<String, Box<dyn std::error::Error>>{
-        let projects = Self::load_projects().get_vec();
-        let mut current_project: [String; 2];
+    pub fn get_project_path(name: String) -> Result<PathBuf, Box<dyn std::error::Error>>{
+        let projects = Self::load_projects()?.get_vec();
+        let mut project_name: String;
+        let mut project_path: PathBuf;
 
-        for current_name in projects {
-            current_project = current_name.get();
-            if current_project[0] == name {
-                return Ok(current_project[1].clone());
+        for current_project in projects {
+            (project_name, project_path) = current_project.get();
+            if project_name == name {
+                return Ok(project_path.clone());
             }
         }
         Err(Box::new(std::fmt::Error))
-    }
-
-    fn set_projects(&mut self, p: Vec<Project>) -> () {
-        self.0 = p;
     }
 
     fn get_vec(self) -> Vec<Project> {
         self.0
     }
 
-    fn save_projects(&mut self) -> () {
+    fn save_projects(&self) -> () {
 
         let projects = self.clone();
-        let homedirectory = get_home_directory();
-        if !Path::new(&(homedirectory.clone() + "/.config/saltz/.projects.ron")).exists() {
-            let _ = fs::create_dir(homedirectory.clone() + "/.config/saltz");
+        let mut homedirectory = get_home_directory();
+        homedirectory.as_mut_os_string().push("/.config/saltz");
+        if homedirectory.exists() {
+            let _ = fs::create_dir(homedirectory.clone());
         } 
-        let mut projects_file = File::create(homedirectory.clone() + "/.config/saltz/.projects.ron")
+        homedirectory.as_mut_os_string().push("/.projects.ron");
+        let mut projects_file = File::create(homedirectory)
             .expect("new config file in load setting");
-        let new_config_file_contents = toml::to_string::<Projects>(&projects);
-        let _ = write!(projects_file, "{}", new_config_file_contents.unwrap());
+        // dbg!(&projects);
+        let new_config_file_contents = match ron::to_string::<Projects>(&projects) {
+            Ok(content) => content,
+            //Err(ron::ser::Error::UnsupportedType(None)) => panic!("Didnt find any Projects."),
+            Err(err) => {
+                dbg!(err);
+                eprintln!("No Projects found.");
+                return
+            },
+        };
+        write!(projects_file, "{}", new_config_file_contents).unwrap_or_else(|err| panic!("Error while caching projects: {}", err));
 
     }
 
-    fn load_projects() -> Self {
+    fn load_projects() -> Result<Self, Box<dyn std::error::Error>>{
         //get all the files and paths from the "database"
-        let homedirectory = get_home_directory();
         let projects_file: String;
-
+        let mut projects_file_path = get_home_directory();
+        projects_file_path.as_mut_os_string().push("/.config/saltz/.projects.ron");
         // if the file exists it just reads from it
-        if Path::new(&(homedirectory.clone() + "/.config/saltz/.projects.ron")).exists() {
-            projects_file = fs::read_to_string( homedirectory.clone() + "/.config/saltz/.projects.ron")
+        if projects_file_path.exists() {
+            projects_file = fs::read_to_string(projects_file_path)
                 .expect("Couldnt read the settings file");
 
-            toml::from_str(&projects_file)
-                .expect("couldnt Deserialize the Config object")
+            match ron::from_str(&projects_file) {
+                Ok(this) => { return Ok(this) },
+                Err(err) => { return Err(err.into()) }
+            }
         }
         // If the File doesnt exist yet it will be created 
-        else {
-            Self::query()
-        }
+        Self::query(false)
     }
-    //searches all non-hidden files
-    fn search_directory (path: String) -> Vec<Project> {
-        let mut projects: Vec<Project> = Vec::new();
-        let mut list_command: Command = Command::new("ls");
-        //println!("{:?}", &path);
-        let raw_output: Output = list_command.current_dir(&path).output().expect("This command should work usually");
-        let output: Vec<u8> = raw_output.stdout;
-        let mut slice_start: usize = 0;
-        let mut slice_end: usize = 0;
-        while output.len() >= slice_end + 2 {
-            slice_end += 1;
-            let _  = match output[slice_end] {
-                b'\n' => {
-                    let len = (slice_end - 1) - slice_start;
-                    if len > 5 {
-                        let _ = match &output[(slice_end - 4)..(slice_end)] {
-                            FILE_ENDING => {
-                                let name = str::from_utf8(&output[slice_start..(slice_end-4)]).unwrap().to_owned();
-                                projects.push(Project::new(name.clone(), path.clone()));
-                                println!("{} ; {}", name, path.clone());
-                                return projects;
-                            },
-                            _ => ()
-                        };
-                    }
-                    let file_name = path.clone() + "/" + str::from_utf8(&output[slice_start..(slice_end)]).unwrap();
-                    let file = Path::new(&file_name);
-                    //dbg!(&file);
-                    if file.is_dir() {
-                        let mut projects_in_dir = Projects::search_directory(file_name);
-                        projects.append(&mut projects_in_dir);
-                    }
-                    slice_end += 1;
-                    slice_start = slice_end;
-                },
-                _ => ()
-            };
-        }
 
-        projects
+    fn search_directory(projects: &mut Vec<Project>, path: &Path, search_hidden: bool) -> Result<(), Box<dyn std::error::Error>> {
+        let mut directory = fs::read_dir(path)?;
+        while let Some(file) = directory.next() {
+            let u_file = file?;
+            let file_path = u_file.path();
+            let file_name = u_file.file_name();
+            let file_type = u_file.metadata()?;
+            let true_name = match file_name.clone().into_string() {
+                Ok(name) => name,
+                Err(_) => continue,
+            };
+            let true_name_start = match true_name.chars().next() {
+                Some(character) => character,
+                None => continue,
+            };
+
+
+            // println!("{:>10}: {}", file_name.display(), file_path.display());
+
+            if file_type.is_dir() {
+                if !(true_name_start == '.') || (search_hidden && true_name.len() >= 1) {
+                    // println!("{:>10}: {}", file_name.display(), file_path.display());
+                    Self::search_directory(projects, &file_path, search_hidden)?;
+                } else { continue }
+            }
+            else if file_type.is_symlink() { continue }
+            // file_path.ends_with(".slz") && 
+            if true_name.len() < 4 { continue }
+            let slz_test = &true_name.as_bytes()[true_name.len() - 4..];
+            // println!("{:>10}: {:?}, {:?}", &true_name, slz_test, FILE_ENDING);
+            if FILE_ENDING == slz_test {
+                let project_name = true_name[..true_name.len()-4].to_owned();
+                println!("{:>10}: {}", &project_name, file_path.display());
+                projects.push(Project::new(project_name, u_file.path()));
+            }
+        }
+        Ok(())
     }
 }
-pub fn get_home_directory () -> String {
+
+pub fn get_home_directory () -> PathBuf{
     let current_user_as_osstring = get_current_username()
         .expect("couldnt get username");
     let current_user = current_user_as_osstring.to_str()
         .expect("couldnt convert username to a string");
-    ("/home/").to_string() + current_user
+    (("/home/").to_string() + current_user).into()
 }

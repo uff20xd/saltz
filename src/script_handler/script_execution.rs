@@ -1,8 +1,9 @@
 use std::process::Command;
+use std::path::PathBuf;
 use crate::project_management::project_management::Projects;
 
 pub struct Script {
-    project_path: String,
+    project_path: PathBuf,
     script: Vec<Command>
 }
 
