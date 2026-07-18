@@ -14,7 +14,6 @@
           overlays = overlayList;
         }
       );
-
       overlayList = [ self.overlays.default ];
     in {
 
